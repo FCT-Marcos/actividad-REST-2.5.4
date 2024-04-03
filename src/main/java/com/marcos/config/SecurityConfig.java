@@ -18,6 +18,8 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 import com.marcos.config.filter.JwtTokenValidator;
 import com.marcos.util.JwtUtils;
 
+import jakarta.servlet.http.HttpServletResponse;
+
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -39,6 +41,11 @@ public class SecurityConfig {
 					// Los enpoints no definidos denegar el acceso
 					http.anyRequest().denyAll();
 				})
+		         .exceptionHandling(exception -> exception
+		         	.authenticationEntryPoint((request, response, authException) -> {
+		         		response.sendError(HttpServletResponse.SC_UNAUTHORIZED, authException.getMessage());
+		         	})
+		         )
 				.addFilterBefore(new JwtTokenValidator(jwtUtils), BasicAuthenticationFilter.class)
 				.build();
 	}

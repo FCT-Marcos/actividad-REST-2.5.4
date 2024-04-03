@@ -8,9 +8,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.marcos.controller.dto.AuthRequest;
-import com.marcos.controller.dto.AuthResponse;
-import com.marcos.service.UserService;
+import com.marcos.controller.dto.AuthRequestDTO;
+import com.marcos.service.AuthService;
 
 import jakarta.validation.Valid;
 
@@ -18,20 +17,28 @@ import jakarta.validation.Valid;
 @RequestMapping("/api/v1/auth")
 public class AuthController {
 
-	private UserService userDetailService;
+	private AuthService userDetailService;
 
 	@Autowired
-	public AuthController(UserService userDetailService) {
+	public AuthController(AuthService userDetailService) {
 		this.userDetailService = userDetailService;
 	}
 
 	@PostMapping("/register")
-	public ResponseEntity<AuthResponse> register(@RequestBody @Valid AuthRequest request) {
-		return new ResponseEntity<>(userDetailService.createUser(request), HttpStatus.CREATED);
+	public ResponseEntity<?> register(@RequestBody @Valid AuthRequestDTO request) {
+		try {
+			return new ResponseEntity<>(userDetailService.createUser(request), HttpStatus.CREATED);
+		} catch (Exception e) {
+			 return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
 	}
 	
 	@PostMapping("/login")
-	public ResponseEntity<AuthResponse> login(@RequestBody @Valid AuthRequest request) {
-		return new ResponseEntity<>(userDetailService.loginUser(request), HttpStatus.OK);
+	public ResponseEntity<?> login(@RequestBody @Valid AuthRequestDTO request) {
+		try {
+			return new ResponseEntity<>(userDetailService.loginUser(request), HttpStatus.OK);
+		} catch (Exception e) {
+			 return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
 	}
 }
